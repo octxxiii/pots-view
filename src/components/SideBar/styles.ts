@@ -194,7 +194,7 @@ export const OpenSideBar = styled.header`
     flex-direction: column;
     justify-content: space-between;
 
-    max-width: 240px;
+    max-width: 340px;
     height: 100%;
 
     background: var(--second-background);

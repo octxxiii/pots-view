@@ -75,7 +75,7 @@ export function SideBar() {
                 </span>
                 <div>
                   <img src={logoImg} alt="Eu" />
-                  <h1>Minha logo </h1>
+                  <h1>사이버게놈 시각화</h1>
                 </div>
 
                 {/* Icones principais do app */}
