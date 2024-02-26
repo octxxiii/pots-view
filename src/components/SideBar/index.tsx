@@ -31,7 +31,7 @@ export function SideBar() {
 
               {/* Links principais do app */}
               <ul>
-                <a href="/" title="악성코드 DNA분석 결과 시각화">
+                <a href="/" title="Alguma coisa">
                   <DiReact />
                 </a>
                 <a href="/" title="Alguma coisa">
@@ -82,19 +82,23 @@ export function SideBar() {
                 <ul>
                   <a href="/" title="Alguma coisa">
                     <DiReact />
-                    <p>Alguma coisa</p>
+                    <p>악성코드 DNA분석 결과 시각화</p>
                   </a>
                   <a href="/" title="Alguma coisa">
                     <DiReact />
-                    <p>Alguma coisa</p>
+                    <p>악성코드 API 서열 분석 결과 시각화</p>
                   </a>
                   <a href="/" title="Alguma coisa">
                     <DiReact />
-                    <p>Alguma coisa</p>
+                    <p>샌드박스 상태 관리</p>
                   </a>
                   <a href="/" title="Alguma coisa">
                     <DiReact />
-                    <p>Alguma coisa</p>
+                    <p>분석 진행 상태 가시화</p>
+                  </a>
+                  <a href="/" title="Alguma coisa">
+                    <DiReact />
+                    <p>샌드박스 결과 가시화</p>
                   </a>
                 </ul>
               </nav>
