@@ -10,10 +10,6 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^5.0.1",
-<<<<<<< HEAD
-    "react-scripts": "^5.0.1",
-=======
->>>>>>> c4d7b1336554ec5ed5bac1424f45165ae433bb6f
     "styled-components": "^6.1.8"
   },
   "name": "pots",
