@@ -75,7 +75,7 @@ export function SideBar() {
                 </span>
                 <div>
                   <img src={logoImg} alt="Eu" />
-                  <h1>Minha logo </h1>
+                  <h1>사이버게놈 시각화</h1>
                 </div>
 
                 {/* Icones principais do app */}
@@ -107,21 +107,21 @@ export function SideBar() {
                 <ul>
                   <a href="/">
                     <IoNotificationsSharp />
-                    <p>Notificações</p>
+                    <p>Notification</p>
                   </a>
                   <a href="/">
                     <MdSettings />
-                    <p>Configurações</p>
+                    <p>Configuration</p>
                   </a>
                   <a href="/">
                     <RiLogoutCircleRLine />
-                    <p> Sair da conta </p>
+                    <p> Logout </p>
                   </a>
                 </ul>
 
                 <span>
                   <img src={userImg} alt="Eu" />
-                  <p>Tiago Gonçalves de Castro</p>
+                  <p>Tiago</p>
                 </span>
               </div>
             </section>
