@@ -11,6 +11,7 @@ import { RiLogoutCircleRLine } from "react-icons/ri"; // Remix Icon
 import logoImg from "../../assets/images/react.png";
 import userImg from "../../assets/images/eu.jpg";
 import dnaIcon from "../../assets/images/dna.png";
+import malware from "../../assets/images/malware.png";
 
 export function SideBar() {
   const [sideBar, setSideBar] = useState(false);
@@ -31,6 +32,11 @@ export function SideBar() {
               <img src={dnaIcon} alt="Eu" />
 
               {/* Links principais do app */}
+              <img
+                src={malware}
+                alt="Eu"
+                style={{ width: "50px", height: "50px", marginBottom: "-30px" }}
+              />
               <ul>
                 <a href="/" title="악성코드 DNA분석 결과 시각화">
                   <DiReact />
@@ -45,6 +51,17 @@ export function SideBar() {
                   <DiReact />
                 </a>
                 <a href="/" title="샌드박스 결과 가시화">
+                  <DiReact />
+                </a>
+              </ul>
+              <ul>
+                <a href="/" title="표적 공격 특성 인자 3차원 가시화">
+                  <DiReact />
+                </a>
+                <a href="/" title="행위 패턴 3차원 가시화">
+                  <DiReact />
+                </a>
+                <a href="/" title="공격 특성 연관 정보 3차원 가시화">
                   <DiReact />
                 </a>
               </ul>
@@ -78,16 +95,24 @@ export function SideBar() {
                   </button>
                 </span>
                 <div>
-                  <img src={dnaIcon} alt="Eu" />
                   <h1>사이버게놈 시각화</h1>
                 </div>
                 <div>
+                  <img
+                    src={malware}
+                    alt="Eu"
+                    style={{
+                      width: "50px",
+                      height: "50px",
+                      marginRight: "-15px",
+                      marginLeft: "-7px",
+                    }}
+                  />
                   <h3>악성코드 게놈 분석</h3>
                 </div>
                 {/* Icones principais do app */}
                 <ul>
-                  <a href="/" title="악성코드 DNA분석 결과 시각화">
-                    {/* <DiReact /> */}
+                  <a href="/dnaview" title="악성코드 DNA분석 결과 시각화">
                     <p>악성코드 DNA분석 결과 시각화</p>
                   </a>
                   <a href="/" title="악성코드 API 서열 분석 결과 시각화">
@@ -149,7 +174,7 @@ export function SideBar() {
                 </span>
               </div>
             </section>
-            <aside onClick={handleChangeSideBar} />
+            {/* <aside onClick={handleChangeSideBar} /> */}
           </OpenSideBar>
         )}
       </Content>

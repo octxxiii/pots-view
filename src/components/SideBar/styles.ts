@@ -55,7 +55,7 @@ export const ClosedSideBar = styled.header`
 
     > button {
       width: 100%;
-      padding: 18px;
+      padding: 10px;
 
       &:hover {
         svg {
@@ -77,11 +77,11 @@ export const ClosedSideBar = styled.header`
       width: 36px;
       height: 36px;
       border-radius: 50%;
-      margin-top: 16px;
+      margin-top: 10px;
     }
 
     ul {
-      margin-top: 64px;
+      margin-top: 40px;
       width: 100%;
       text-align: center;
       display: flex;
@@ -90,7 +90,7 @@ export const ClosedSideBar = styled.header`
 
       a {
         width: 100%;
-        padding: 16px 0;
+        padding: 8px 0;
         border-radius: 8px 0 0 8px;
 
         display: flex;
@@ -124,7 +124,7 @@ export const ClosedSideBar = styled.header`
     width: 100%;
 
     ul {
-      margin-bottom: 16px;
+      margin-bottom: 17px;
       text-align: center;
       width: 100%;
       display: flex;
@@ -220,7 +220,7 @@ export const OpenSideBar = styled.header`
 
         button {
           cursor: pointer;
-          padding: 18px;
+          padding: 10px 10px 10px 18px;
 
           &:hover {
             svg path {
@@ -238,7 +238,7 @@ export const OpenSideBar = styled.header`
       }
 
       div {
-        margin-top: 16px;
+        margin-top: 10px;
 
         display: flex;
         align-items: center;
