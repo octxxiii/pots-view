@@ -145,7 +145,7 @@ export function SideBar() {
 
                 <span>
                   <img src={userImg} alt="Eu" />
-                  <p style={{ color: "black" }}>김민준</p>
+                  <p style={{ color: "#fff" }}>Kim</p>
                 </span>
               </div>
             </section>

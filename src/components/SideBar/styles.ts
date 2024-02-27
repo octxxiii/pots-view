@@ -193,7 +193,7 @@ export const OpenSideBar = styled.header`
     align-items: flex-start;
     flex-direction: column;
     justify-content: space-between;
-    min-width: 305px;
+    min-width: 321px;
     max-width: 500px;
     height: 100%;
 
@@ -255,14 +255,18 @@ export const OpenSideBar = styled.header`
 
         h1 {
           color: #fff;
-          font-size: 14px;
+          font-size: 24px;
 
           animation: ${appearFromRight} 0.4s;
+        }
+
+        h3 {
+          margin-top: 15px;
         }
       }
 
       ul {
-        margin-top: 5px;
+        margin-top: 0px;
         width: 100%;
         text-align: left;
         display: flex;
@@ -270,7 +274,7 @@ export const OpenSideBar = styled.header`
 
         a {
           color: #c4c4c4;
-          padding: 10px 20px;
+          padding: 10px 30px 2px;
           border-radius: 8px 0 0 8px;
 
           display: flex;
@@ -288,6 +292,7 @@ export const OpenSideBar = styled.header`
 
           p {
             animation: ${appearFromRight} 0.4s;
+            color: wheat;
           }
 
           svg {
