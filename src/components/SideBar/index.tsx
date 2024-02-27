@@ -10,6 +10,7 @@ import { RiLogoutCircleRLine } from "react-icons/ri"; // Remix Icon
 
 import logoImg from "../../assets/images/react.png";
 import userImg from "../../assets/images/eu.jpg";
+import dnaIcon from "../../assets/images/dna.png";
 
 export function SideBar() {
   const [sideBar, setSideBar] = useState(false);
@@ -27,20 +28,23 @@ export function SideBar() {
                 <BsArrowRight />
               </button>
 
-              <img src={logoImg} alt="Eu" />
+              <img src={dnaIcon} alt="Eu" />
 
               {/* Links principais do app */}
               <ul>
-                <a href="/" title="Alguma coisa">
+                <a href="/" title="악성코드 DNA분석 결과 시각화">
                   <DiReact />
                 </a>
-                <a href="/" title="Alguma coisa">
+                <a href="/" title="악성코드 API 서열 분석 결과 시각화">
                   <DiReact />
                 </a>
-                <a href="/" title="Alguma coisa">
+                <a href="/" title="샌드박스 상태 관리">
                   <DiReact />
                 </a>
-                <a href="/" title="Alguma coisa">
+                <a href="/" title="분석 진행 상태 가시화">
+                  <DiReact />
+                </a>
+                <a href="/" title="샌드박스 결과 가시화">
                   <DiReact />
                 </a>
               </ul>
@@ -74,31 +78,51 @@ export function SideBar() {
                   </button>
                 </span>
                 <div>
-                  <img src={logoImg} alt="Eu" />
+                  <img src={dnaIcon} alt="Eu" />
                   <h1>사이버게놈 시각화</h1>
                 </div>
-
+                <div>
+                  <h3>악성코드 게놈 분석</h3>
+                </div>
                 {/* Icones principais do app */}
                 <ul>
-                  <a href="/" title="Alguma coisa">
-                    <DiReact />
+                  <a href="/" title="악성코드 DNA분석 결과 시각화">
+                    {/* <DiReact /> */}
                     <p>악성코드 DNA분석 결과 시각화</p>
                   </a>
-                  <a href="/" title="Alguma coisa">
-                    <DiReact />
+                  <a href="/" title="악성코드 API 서열 분석 결과 시각화">
+                    {/* <DiReact /> */}
                     <p>악성코드 API 서열 분석 결과 시각화</p>
                   </a>
-                  <a href="/" title="Alguma coisa">
-                    <DiReact />
+                  <a href="/" title="샌드박스 상태 관리">
+                    {/* <DiReact /> */}
                     <p>샌드박스 상태 관리</p>
                   </a>
-                  <a href="/" title="Alguma coisa">
-                    <DiReact />
+                  <a href="/" title="분석 진행 상태 가시화">
+                    {/* <DiReact /> */}
                     <p>분석 진행 상태 가시화</p>
                   </a>
-                  <a href="/" title="Alguma coisa">
-                    <DiReact />
+                  <a href="/" title="샌드박스 결과 가시화">
+                    {/* <DiReact /> */}
                     <p>샌드박스 결과 가시화</p>
+                  </a>
+                </ul>
+                <div>
+                  <h3>사이버게놈 분석 결과 3D 시각화</h3>
+                </div>
+                {/* Icones principais do app */}
+                <ul>
+                  <a href="/" title="표적 공격 특성 인자 3차원 가시화">
+                    {/* <DiReact /> */}
+                    <p>표적 공격 특성 인자 3차원 가시화</p>
+                  </a>
+                  <a href="/" title="행위 패턴 3차원 가시화">
+                    {/* <DiReact /> */}
+                    <p>행위 패턴 3차원 가시화</p>
+                  </a>
+                  <a href="/" title="공격 특성 연관 정보 3차원 가시화">
+                    {/* <DiReact /> */}
+                    <p>공격 특성 연관 정보 3차원 가시화</p>
                   </a>
                 </ul>
               </nav>
@@ -121,7 +145,7 @@ export function SideBar() {
 
                 <span>
                   <img src={userImg} alt="Eu" />
-                  <p>Tiago</p>
+                  <p style={{ color: "black" }}>김민준</p>
                 </span>
               </div>
             </section>

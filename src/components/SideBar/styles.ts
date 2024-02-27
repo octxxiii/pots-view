@@ -193,8 +193,8 @@ export const OpenSideBar = styled.header`
     align-items: flex-start;
     flex-direction: column;
     justify-content: space-between;
-
-    max-width: 240px;
+    min-width: 305px;
+    max-width: 500px;
     height: 100%;
 
     background: var(--second-background);
@@ -262,7 +262,7 @@ export const OpenSideBar = styled.header`
       }
 
       ul {
-        margin-top: 64px;
+        margin-top: 5px;
         width: 100%;
         text-align: left;
         display: flex;
@@ -270,7 +270,7 @@ export const OpenSideBar = styled.header`
 
         a {
           color: #c4c4c4;
-          padding: 16px 20px;
+          padding: 10px 20px;
           border-radius: 8px 0 0 8px;
 
           display: flex;
