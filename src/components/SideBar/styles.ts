@@ -1,4 +1,8 @@
-import styled, { keyframes } from "styled-components";
+import styled, { css, keyframes } from "styled-components";
+
+interface SidebarProps {
+  isOpen: boolean;
+}
 
 const appearFromRight = keyframes`
   from {
@@ -20,19 +24,22 @@ export const Content = styled.div`
   display: flex;
 `;
 
-export const ClosedSideBar = styled.header`
+export const ClosedSideBar = styled.header<SidebarProps>`
+  ${({ isOpen }) => `
+    width: ${isOpen ? "250px" : "60px"};
+    @media (max-width: 768px) {
+      width: ${isOpen ? "250px" : "0px"};
+    }
+  `}
+  transition: width 0.3s ease;
   max-width: 60px;
-  width: 100%;
   height: 100%;
   border-radius: 0 12px 12px 0;
-
   background: var(--second-background);
-
   position: fixed;
   left: 0;
   top: 0;
   z-index: 100;
-
   display: flex;
   align-items: center;
   flex-direction: column;
@@ -42,11 +49,12 @@ export const ClosedSideBar = styled.header`
     color: #f9f9f9;
   }
 
-  ul li {
+  ul,
+  li {
     cursor: pointer;
   }
 
-  /* Links principais do app */
+  /* 주요 앱 링크 */
   nav {
     display: flex;
     align-items: center;
@@ -56,21 +64,16 @@ export const ClosedSideBar = styled.header`
     > button {
       width: 100%;
       padding: 10px;
-
       &:hover {
-        svg {
-          path {
-            color: var(--third-color);
-          }
+        svg path {
+          color: var(--third-color);
         }
       }
-    }
-
-    > button svg {
-      width: 24px;
-      height: 24px;
-
-      color: #c4c4c4;
+      svg {
+        width: 24px;
+        height: 24px;
+        color: #c4c4c4;
+      }
     }
 
     > img {
@@ -92,20 +95,14 @@ export const ClosedSideBar = styled.header`
         width: 100%;
         padding: 8px 0;
         border-radius: 8px 0 0 8px;
-
         display: flex;
         align-items: center;
         justify-content: center;
-
         transition: background 0.3s;
-
         &:hover {
           background: var(--primary-background);
-
-          svg {
-            path {
-              color: var(--third-color);
-            }
+          svg path {
+            color: var(--third-color);
           }
         }
         svg {
@@ -116,7 +113,7 @@ export const ClosedSideBar = styled.header`
     }
   }
 
-  /* Icones que pode não ser tão principais no app */
+  /* 추가 아이콘 */
   div {
     display: flex;
     align-items: center;
@@ -137,8 +134,8 @@ export const ClosedSideBar = styled.header`
         display: flex;
         align-items: center;
         justify-content: center;
-
         transition: color 0.3s;
+
         &:hover {
           svg path {
             color: var(--third-color);
@@ -155,13 +152,12 @@ export const ClosedSideBar = styled.header`
       padding: 16px 0;
       text-align: center;
       border-radius: 8px 8px 0 0;
-
       display: flex;
       align-items: center;
       justify-content: center;
-
       background: var(--third-color);
       width: 100%;
+
       img {
         width: 32px;
         height: 32px;
@@ -293,6 +289,9 @@ export const OpenSideBar = styled.header`
           p {
             animation: ${appearFromRight} 0.4s;
             color: wheat;
+            &:hover {
+              color: white;
+            }
           }
 
           svg {

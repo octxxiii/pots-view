@@ -10,10 +10,17 @@ import { RiLogoutCircleRLine } from "react-icons/ri"; // Remix Icon
 
 import logoImg from "../../assets/images/react.png";
 import userImg from "../../assets/images/eu.jpg";
-import dnaIcon from "../../assets/images/dna.png";
+import dnaIcon from "../../assets/images/dnaicon.png";
 import malware from "../../assets/images/malware.png";
+import dna3d from "../../assets/images/dna3D.png";
+import React, { Dispatch, SetStateAction } from "react";
 
-export function SideBar() {
+type SideBarProps = {
+  isOpen: boolean;
+  setIsOpen: Dispatch<SetStateAction<boolean>>;
+};
+
+export const SideBar: React.FC<SideBarProps> = ({ isOpen, setIsOpen }) => {
   const [sideBar, setSideBar] = useState(false);
 
   function handleChangeSideBar() {
@@ -23,46 +30,109 @@ export function SideBar() {
     <Container>
       <Content>
         {!sideBar ? (
-          <ClosedSideBar>
+          <ClosedSideBar isOpen={sideBar}>
             <nav>
               <button onClick={handleChangeSideBar}>
                 <BsArrowRight />
               </button>
 
-              <img src={dnaIcon} alt="Eu" />
-
-              {/* Links principais do app */}
               <img
-                src={malware}
+                src={dnaIcon}
                 alt="Eu"
-                style={{ width: "50px", height: "50px", marginBottom: "-30px" }}
+                style={{ width: "40px", height: "40px" }}
               />
               <ul>
-                <a href="/" title="악성코드 DNA분석 결과 시각화">
-                  <DiReact />
+                <a href="/dna-view" title="악성코드 DNA분석 결과 시각화">
+                  <img
+                    src={malware}
+                    alt="Eu"
+                    style={{
+                      width: "30px",
+                      height: "30px",
+                      marginTop: "-20px",
+                      marginBottom: "-10px",
+                    }}
+                  />
                 </a>
                 <a href="/" title="악성코드 API 서열 분석 결과 시각화">
-                  <DiReact />
+                  <img
+                    src={malware}
+                    alt="Eu"
+                    style={{
+                      width: "30px",
+                      height: "30px",
+                      marginBottom: "-10px",
+                    }}
+                  />
                 </a>
                 <a href="/" title="샌드박스 상태 관리">
-                  <DiReact />
+                  <img
+                    src={malware}
+                    alt="Eu"
+                    style={{
+                      width: "30px",
+                      height: "30px",
+                      marginBottom: "-10px",
+                    }}
+                  />
                 </a>
                 <a href="/" title="분석 진행 상태 가시화">
-                  <DiReact />
+                  <img
+                    src={malware}
+                    alt="Eu"
+                    style={{
+                      width: "30px",
+                      height: "30px",
+                      marginBottom: "-10px",
+                    }}
+                  />
                 </a>
                 <a href="/" title="샌드박스 결과 가시화">
-                  <DiReact />
+                  <img
+                    src={malware}
+                    alt="Eu"
+                    style={{
+                      width: "30px",
+                      height: "30px",
+                      marginBottom: "-10px",
+                    }}
+                  />
                 </a>
               </ul>
               <ul>
                 <a href="/" title="표적 공격 특성 인자 3차원 가시화">
-                  <DiReact />
+                  <img
+                    src={dna3d}
+                    alt="Eu"
+                    style={{
+                      width: "30px",
+                      height: "30px",
+                      marginBottom: "-10px",
+                      marginTop: "-20px",
+                    }}
+                  />
                 </a>
                 <a href="/" title="행위 패턴 3차원 가시화">
-                  <DiReact />
+                  <img
+                    src={dna3d}
+                    alt="Eu"
+                    style={{
+                      width: "30px",
+                      height: "30px",
+                      marginBottom: "-10px",
+                    }}
+                  />
                 </a>
                 <a href="/" title="공격 특성 연관 정보 3차원 가시화">
-                  <DiReact />
+                  <img
+                    src={dna3d}
+                    alt="Eu"
+                    style={{
+                      width: "30px",
+                      height: "30px",
+                      marginBottom: "-10px",
+                    }}
+                  />
                 </a>
               </ul>
             </nav>
@@ -95,24 +165,23 @@ export function SideBar() {
                   </button>
                 </span>
                 <div>
+                  <img
+                    src={dnaIcon}
+                    alt="Eu"
+                    style={{
+                      width: "30px",
+                      height: "30px",
+                      marginRight: "-15px",
+                    }}
+                  />
                   <h1>사이버게놈 시각화</h1>
                 </div>
                 <div>
-                  <img
-                    src={malware}
-                    alt="Eu"
-                    style={{
-                      width: "50px",
-                      height: "50px",
-                      marginRight: "-15px",
-                      marginLeft: "-7px",
-                    }}
-                  />
                   <h3>악성코드 게놈 분석</h3>
                 </div>
                 {/* Icones principais do app */}
                 <ul>
-                  <a href="/dnaview" title="악성코드 DNA분석 결과 시각화">
+                  <a href="/dna-view" title="악성코드 DNA분석 결과 시각화">
                     <p>악성코드 DNA분석 결과 시각화</p>
                   </a>
                   <a href="/" title="악성코드 API 서열 분석 결과 시각화">
@@ -180,4 +249,4 @@ export function SideBar() {
       </Content>
     </Container>
   );
-}
+};

@@ -3,8 +3,8 @@ import {
   Container,
   Box,
   Typography,
-  TextField,
   Table,
+  TableHead,
   TableBody,
   TableCell,
   TableContainer,
@@ -12,35 +12,63 @@ import {
   Paper,
 } from "@mui/material";
 
-type Props = {
-  // 여기에 props의 타입을 정의합니다.
-  message: string;
-  count?: number; // 선택적 속성
+type DnaViewProps = {
+  isOpen: boolean;
 };
 
-const DnaView: React.FC = () => {
+const tempData = [
+  {
+    id: "1",
+    hash: "abc123",
+    fileName: "file1.exe",
+    groupName: "Group A",
+    extraInfo: "N/A",
+  },
+  {
+    id: "2",
+    hash: "def456",
+    fileName: "file2.exe",
+    groupName: "Group B",
+    extraInfo: "N/A",
+  },
+];
+
+const DnaView: React.FC<DnaViewProps> = ({ isOpen }) => {
   return (
     <Container maxWidth="lg">
       <Box my={4}>
-        <Typography variant="h4" gutterBottom>
+        <Typography variant="h4" gutterBottom style={{ color: "black" }}>
           악성코드 DNA 분석 결과 시각화
         </Typography>
         <TableContainer component={Paper}>
           <Table sx={{ minWidth: 650 }} aria-label="simple table">
-            <TableBody>
-              {/* 여기에 테이블 로우를 추가하세요 */}
+            <TableHead>
               <TableRow>
-                <TableCell component="th" scope="row">
-                  분석요청ID
-                </TableCell>
-                <TableCell align="right">/* 요청 ID 값 */</TableCell>
-                <TableCell align="right">/* 해시 */</TableCell>
-                <TableCell align="right">/* 파일명 */</TableCell>
-                <TableCell align="right">/* 결과 명칭 */</TableCell>
-                <TableCell align="right">/* 추적 선호 */</TableCell>
-                {/* 각 셀에 해당하는 데이터를 넣어야 합니다 */}
+                <TableCell align="center">분석요청ID</TableCell>
+                <TableCell align="center">해시</TableCell>
+                <TableCell align="center">파일명</TableCell>
+                <TableCell align="center">그룹 명칭</TableCell>
+                <TableCell align="center">추가 정보</TableCell>
               </TableRow>
-              {/* 추가 로우를 위한 코드 */}
+            </TableHead>
+            <TableBody>
+              {tempData.length > 0 ? (
+                tempData.map((data) => (
+                  <TableRow key={data.id}>
+                    <TableCell align="center">{data.id}</TableCell>
+                    <TableCell align="center">{data.hash}</TableCell>
+                    <TableCell align="center">{data.fileName}</TableCell>
+                    <TableCell align="center">{data.groupName}</TableCell>
+                    <TableCell align="center">{data.extraInfo}</TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell align="center" colSpan={5}>
+                    데이터가 없습니다.
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </TableContainer>
