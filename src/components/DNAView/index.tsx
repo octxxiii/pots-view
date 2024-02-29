@@ -10,117 +10,206 @@ import {
   TableContainer,
   TableRow,
   Paper,
+  TablePagination,
   Checkbox,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Button,
-  TextField,
-  SelectChangeEvent,
+  IconButton,
+  createTheme,
+  ThemeProvider,
 } from "@mui/material";
+import { Delete as DeleteIcon, Edit as EditIcon } from "@mui/icons-material";
+
+const advancedTheme = createTheme({
+  palette: {
+    mode: "dark",
+    primary: {
+      main: "#512DA8", // Deep purple
+    },
+    secondary: {
+      main: "#C2185B", // Deep pink
+    },
+    background: {
+      default: "#212121", // Dark grey
+      paper: "#333", // Darker grey
+    },
+    text: {
+      primary: "#FFFFFF", // White
+      secondary: "#C2185B", // Deep pink (secondary text)
+    },
+  },
+  typography: {
+    fontFamily: '"Roboto", sans-serif', // Roboto font
+    h4: {
+      fontWeight: 500,
+      color: "#fff", // Deep purple (header color)
+    },
+  },
+});
+
+type RowData = {
+  id: string;
+  hash: string;
+  fileName: string;
+  groupName: string;
+  extraInfo: string;
+};
+
+const createData = (
+  id: string,
+  hash: string,
+  fileName: string,
+  groupName: string,
+  extraInfo: string
+): RowData => {
+  return { id, hash, fileName, groupName, extraInfo };
+};
+
+const rows: RowData[] = Array.from({ length: 12 }, (_, index) =>
+  createData(
+    `${index + 1}`,
+    `hash${index + 1}`,
+    `file${index + 1}.exe`,
+    `Group ${String.fromCharCode(65 + (index % 26))}`,
+    "N/A"
+  )
+);
 
 type DnaViewProps = {
   isOpen: boolean;
 };
 
-const tempData = [
-  {
-    id: "1",
-    hash: "abc123",
-    fileName: "file1.exe",
-    groupName: "Group A",
-    extraInfo: "N/A",
-  },
-  {
-    id: "2",
-    hash: "def456",
-    fileName: "file2.exe",
-    groupName: "Group B",
-    extraInfo: "N/A",
-  },
-];
-
 function DnaView({ isOpen }: DnaViewProps) {
-  const [filter, setFilter] = useState<string>("");
-  const [checked, setChecked] = useState<boolean>(false);
+  const [selected, setSelected] = useState<string[]>([]);
+  const [page, setPage] = useState<number>(0);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(10);
 
-  const handleFilterChange = (event: SelectChangeEvent) => {
-    setFilter(event.target.value);
+  const handleChangePage = (
+    event: React.MouseEvent<HTMLButtonElement> | null,
+    newPage: number
+  ) => {
+    setPage(newPage);
   };
 
-  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setChecked(event.target.checked);
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.checked) {
+      const newSelecteds = rows.map((n) => n.id);
+      setSelected(newSelecteds);
+      return;
+    }
+    setSelected([]);
+  };
+
+  const handleClick = (id: string) => {
+    const selectedIndex = selected.indexOf(id);
+    let newSelected: string[] = [];
+
+    if (selectedIndex === -1) {
+      newSelected = newSelected.concat(selected, id);
+    } else if (selectedIndex === 0) {
+      newSelected = newSelected.concat(selected.slice(1));
+    } else if (selectedIndex === selected.length - 1) {
+      newSelected = newSelected.concat(selected.slice(0, -1));
+    } else if (selectedIndex > 0) {
+      newSelected = newSelected.concat(
+        selected.slice(0, selectedIndex),
+        selected.slice(selectedIndex + 1)
+      );
+    }
+
+    setSelected(newSelected);
   };
 
   return (
-    <Container maxWidth="lg">
-      <Box my={4}>
-        <Typography variant="h4" gutterBottom sx={{ color: "black" }}>
-          악성코드 DNA 분석 결과 시각화
-        </Typography>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "flex-end",
-            alignItems: "center",
-            marginBottom: 2,
-          }}
-        >
-          <FormControl
-            variant="filled"
-            sx={{ minWidth: 200, maxHeight: 100, color: "black" }}
-          >
-            <InputLabel id="demo-simple-select-filled-label">
-              필터링 대상
-            </InputLabel>
-            <Select
-              labelId="demo-simple-select-filled-label"
-              id="demo-simple-select-filled"
-              value={filter}
-              onChange={handleFilterChange}
-              sx={{ color: "black", ".MuiSvgIcon-root": { color: "black" } }} // MUI icon color
-            >
-              <MenuItem value="">
-                <em>None</em>
-              </MenuItem>
-              <MenuItem value="id">분석요청ID</MenuItem>
-              <MenuItem value="hash">해시</MenuItem>
-              {/* 추가 필터링 옵션 */}
-            </Select>
-          </FormControl>
-          <TextField
-            id="filled-basic"
-            label="필터링 조건"
-            variant="filled"
-            sx={{
-              color: "black",
-              ".MuiInputBase-root": { color: "black" },
-              marginLeft: 2,
-            }} // Text field styles
-          />
-          <Checkbox
-            checked={checked}
-            onChange={handleCheckboxChange}
-            sx={{ color: "black", "&.Mui-checked": { color: "black" } }} // Checkbox styles
+    <ThemeProvider theme={advancedTheme}>
+      <Container maxWidth="lg">
+        <Box my={4}>
+          <Typography variant="h4" gutterBottom>
+            악성코드 DNA 분석 결과 시각화
+          </Typography>
+          <TableContainer component={Paper}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell padding="checkbox">
+                    <Checkbox
+                      color="primary"
+                      indeterminate={
+                        selected.length > 0 && selected.length < rows.length
+                      }
+                      checked={
+                        rows.length > 0 && selected.length === rows.length
+                      }
+                      onChange={handleSelectAllClick}
+                    />
+                  </TableCell>
+                  <TableCell>분석요청ID</TableCell>
+                  <TableCell>해시</TableCell>
+                  <TableCell>파일명</TableCell>
+                  <TableCell>그룹 명칭</TableCell>
+                  <TableCell>추가 정보</TableCell>
+                  <TableCell align="right">Actions</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {rows
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((row, index) => {
+                    const isItemSelected = selected.indexOf(row.id) !== -1;
+                    return (
+                      <TableRow
+                        key={row.id}
+                        selected={isItemSelected}
+                        onClick={() => handleClick(row.id)}
+                        hover
+                      >
+                        <TableCell padding="checkbox">
+                          <Checkbox
+                            color="primary"
+                            checked={isItemSelected}
+                            inputProps={{
+                              "aria-labelledby": `enhanced-table-checkbox-${index}`,
+                            }}
+                          />
+                        </TableCell>
+                        <TableCell component="th" scope="row">
+                          {row.id}
+                        </TableCell>
+                        <TableCell>{row.hash}</TableCell>
+                        <TableCell>{row.fileName}</TableCell>
+                        <TableCell>{row.groupName}</TableCell>
+                        <TableCell>{row.extraInfo}</TableCell>
+                        <TableCell align="right">
+                          <IconButton aria-label="edit">
+                            <EditIcon />
+                          </IconButton>
+                          <IconButton aria-label="delete">
+                            <DeleteIcon />
+                          </IconButton>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          <TablePagination
+            rowsPerPageOptions={[10, 25, 50]}
+            component="div"
+            count={rows.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
           />
         </Box>
-        <TableContainer component={Paper}>
-          <Table sx={{ minWidth: 650 }} aria-label="simple table">
-            <TableHead>
-              <TableRow>
-                <TableCell align="center">분석요청ID</TableCell>
-                <TableCell align="center">해시</TableCell>
-                <TableCell align="center">파일명</TableCell>
-                <TableCell align="center">그룹 명칭</TableCell>
-                <TableCell align="center">추가 정보</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>{/* 테이블 바디 데이터 */}</TableBody>
-          </Table>
-        </TableContainer>
-      </Box>
-    </Container>
+      </Container>
+    </ThemeProvider>
   );
 }
 
