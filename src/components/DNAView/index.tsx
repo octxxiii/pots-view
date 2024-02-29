@@ -41,7 +41,7 @@ const tempData = [
   },
 ];
 
-const DnaView: React.FC<{ isOpen: boolean }> = ({ isOpen }) => {
+function DnaView({ isOpen }: DnaViewProps) {
   const [filter, setFilter] = useState<string>("");
   const [checked, setChecked] = useState<boolean>(false);
 
@@ -122,6 +122,6 @@ const DnaView: React.FC<{ isOpen: boolean }> = ({ isOpen }) => {
       </Box>
     </Container>
   );
-};
+}
 
 export default DnaView;

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { GlobalStyle } from "./components/SideBar/styles/global";
-import { SideBar } from "./components/SideBar";
+import SideBar from "./components/SideBar";
 import DnaView from "./components/DNAView";
 import styled from "styled-components";
 

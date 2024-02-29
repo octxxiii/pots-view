@@ -20,12 +20,13 @@ type SideBarProps = {
   setIsOpen: Dispatch<SetStateAction<boolean>>;
 };
 
-export const SideBar: React.FC<SideBarProps> = ({ isOpen, setIsOpen }) => {
+function SideBar({ isOpen, setIsOpen }: SideBarProps) {
   const [sideBar, setSideBar] = useState(false);
 
   function handleChangeSideBar() {
     setSideBar((prevState) => !prevState);
   }
+
   return (
     <Container>
       <Content>
@@ -249,4 +250,6 @@ export const SideBar: React.FC<SideBarProps> = ({ isOpen, setIsOpen }) => {
       </Content>
     </Container>
   );
-};
+}
+
+export default SideBar;
