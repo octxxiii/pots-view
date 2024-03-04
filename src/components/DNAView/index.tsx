@@ -308,9 +308,7 @@ function DnaView({ isOpen }: DnaViewProps) {
     <ThemeProvider theme={advancedTheme}>
       <Container maxWidth="lg">
         <Box my={3} style={{ maxHeight: "51vh", overflow: "auto" }}>
-          <Typography variant="h4" gutterBottom>
-            악성코드 DNA 분석 결과 시각화
-          </Typography>
+          악성코드 DNA 분석 결과 시각화
           <Box my={0}>
             <Button
               variant="contained"
