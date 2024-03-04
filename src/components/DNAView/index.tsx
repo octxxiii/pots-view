@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Container,
   Box,
@@ -15,8 +15,10 @@ import {
   IconButton,
   createTheme,
   ThemeProvider,
+  TextField,
 } from "@mui/material";
 import { Delete as DeleteIcon, Edit as EditIcon } from "@mui/icons-material";
+import SaveIcon from "@mui/icons-material/Save";
 
 const advancedTheme = createTheme({
   palette: {
@@ -81,6 +83,73 @@ function DnaView({ isOpen }: DnaViewProps) {
   const [selected, setSelected] = useState<string[]>([]);
   const [page, setPage] = useState<number>(0);
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
+  const [editingRow, setEditingRow] = useState<string | null>(null);
+  const [rowData, setRowData] = useState<RowData[]>(rows);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editId, setEditId] = useState<string>("");
+  const [editingHash, setEditingHash] = useState<string | null>(null);
+  const [editHash, setEditHash] = useState<string>("");
+  const [editingFileName, setEditingFileName] = useState<string | null>(null);
+  const [editFileName, setEditFileName] = useState<string>("");
+  const [editingGroupName, setEditingGroupName] = useState<string | null>(null);
+  const [editGroupName, setEditGroupName] = useState<string>("");
+  const [editingExtraInfo, setEditingExtraInfo] = useState<string | null>(null);
+  const [editExtraInfo, setEditExtraInfo] = useState<string>("");
+  const [tableRows, setTableRows] = useState<RowData[]>(rows);
+
+  const handleSaveClick = (id: string) => {
+    // 수정된 값을 상태로 업데이트
+    const updatedRows = tableRows.map((row) =>
+      row.id === id
+        ? {
+            ...row,
+            id: editId,
+            hash: editHash,
+            fileName: editFileName,
+            groupName: editGroupName,
+            extraInfo: editExtraInfo,
+          }
+        : row
+    );
+    setTableRows(updatedRows);
+  
+    // Clear editing state
+    setEditingRow(null);
+    setEditingId(null);
+    setEditId("");
+    setEditingHash(null);
+    setEditHash("");
+    setEditingFileName(null);
+    setEditFileName("");
+    setEditingGroupName(null);
+    setEditGroupName("");
+    setEditingExtraInfo(null);
+    setEditExtraInfo("");
+  };
+  
+  
+  
+  const handleEditClick = (id: string) => {
+    // Editing 상태로 변경되었을 때 해당 행의 값을 초기값으로 설정
+    const row = rowData.find((row) => row.id === id);
+    if (row) {
+      setEditingId(id);
+      setEditId(row.id);
+      setEditingHash(id);
+      setEditHash(row.hash);
+      setEditingFileName(id);
+      setEditFileName(row.fileName);
+      setEditingGroupName(id);
+      setEditGroupName(row.groupName);
+      setEditingExtraInfo(id);
+      setEditExtraInfo(row.extraInfo);
+    }
+  };
+
+  const handleDeleteClick = (id: string) => {
+    const updatedRows = tableRows.filter((row) => row.id !== id);
+    setTableRows(updatedRows);
+  };
 
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
@@ -98,7 +167,7 @@ function DnaView({ isOpen }: DnaViewProps) {
 
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
-      const newSelecteds = rows.map((n) => n.id);
+      const newSelecteds = rowData.map((n) => n.id);
       setSelected(newSelecteds);
       return;
     }
@@ -140,10 +209,10 @@ function DnaView({ isOpen }: DnaViewProps) {
                     <Checkbox
                       color="primary"
                       indeterminate={
-                        selected.length > 0 && selected.length < rows.length
+                        selected.length > 0 && selected.length < rowData.length
                       }
                       checked={
-                        rows.length > 0 && selected.length === rows.length
+                        rowData.length > 0 && selected.length === rowData.length
                       }
                       onChange={handleSelectAllClick}
                     />
@@ -157,10 +226,11 @@ function DnaView({ isOpen }: DnaViewProps) {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {rows
+                {rowData
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row, index) => {
                     const isItemSelected = selected.indexOf(row.id) !== -1;
+                    const isEditing = editingRow === row.id;
                     return (
                       <TableRow
                         key={row.id}
@@ -178,20 +248,81 @@ function DnaView({ isOpen }: DnaViewProps) {
                           />
                         </TableCell>
                         <TableCell component="th" scope="row">
-                          {row.id}
+                          {editingId === row.id ? (
+                            <TextField
+                              id={`id-${row.id}`}
+                              value={editId}
+                              onChange={(e) => setEditId(e.target.value)}
+                              fullWidth
+                              size="small"
+                            />
+                          ) : (
+                            row.id
+                          )}
                         </TableCell>
-                        <TableCell>{row.hash}</TableCell>
-                        <TableCell>{row.fileName}</TableCell>
-                        <TableCell>{row.groupName}</TableCell>
-                        <TableCell>{row.extraInfo}</TableCell>
+                        <TableCell>
+                          {editingHash === row.id ? (
+                            <TextField
+                              id={`hash-${row.id}`}
+                              value={editHash}
+                              onChange={(e) => setEditHash(e.target.value)}
+                              fullWidth
+                              size="small"
+                            />
+                          ) : (
+                            row.hash
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {editingFileName === row.id ? (
+                            <TextField
+                              id={`filename-${row.id}`}
+                              value={editFileName}
+                              onChange={(e) => setEditFileName(e.target.value)}
+                              fullWidth
+                              size="small"
+                            />
+                          ) : (
+                            row.fileName
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {editingGroupName === row.id ? (
+                            <TextField
+                              id={`groupname-${row.id}`}
+                              value={editGroupName}
+                              onChange={(e) => setEditGroupName(e.target.value)}
+                              fullWidth
+                              size="small"
+                            />
+                          ) : (
+                            row.groupName
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {editingExtraInfo === row.id ? (
+                            <TextField
+                              id={`extrainfo-${row.id}`}
+                              value={editExtraInfo}
+                              onChange={(e) => setEditExtraInfo(e.target.value)}
+                              fullWidth
+                              size="small"
+                            />
+                          ) : (
+                            row.extraInfo
+                          )}
+                        </TableCell>
                         <TableCell align="right">
-                          <IconButton aria-label="edit">
-                            <EditIcon />
-                          </IconButton>
-                          <IconButton aria-label="delete">
-                            <DeleteIcon />
-                          </IconButton>
-                        </TableCell>
+  {editingId === row.id ? (
+    <IconButton onClick={() => handleSaveClick(row.id)}>
+      <SaveIcon />
+    </IconButton>
+  ) : (
+    <IconButton onClick={() => handleEditClick(row.id)}>
+      <EditIcon />
+    </IconButton>
+  )}
+</TableCell>
                       </TableRow>
                     );
                   })}
@@ -201,7 +332,7 @@ function DnaView({ isOpen }: DnaViewProps) {
           <TablePagination
             rowsPerPageOptions={[10, 25, 50]}
             component="div"
-            count={rows.length}
+            count={rowData.length}
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={handleChangePage}
