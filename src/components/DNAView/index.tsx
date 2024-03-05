@@ -24,6 +24,11 @@ import { Delete as DeleteIcon, Edit as EditIcon } from "@mui/icons-material";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel"; // 취소 아이콘 추가
 
+const swalStyle = {
+  background: "#333",
+  color: "#fff",
+};
+
 const advancedTheme = createTheme({
   palette: {
     mode: "dark",
@@ -62,28 +67,44 @@ const advancedTheme = createTheme({
   },
 });
 
+const customConfirm = async (message: string): Promise<boolean> => {
+  const { isConfirmed } = await Swal.fire({
+    title: message,
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#3085d6",
+    cancelButtonColor: "#d33",
+    confirmButtonText: "YES",
+    background: "#333",
+    color: "#fff",
+    customClass: {
+      container: "my-custom-container-class",
+    },
+    width: "15%",
+  });
+  return isConfirmed;
+};
+
 type RowData = {
   id: string;
   hash: string;
   fileName: string;
   groupName: string;
   extraInfo: string;
-  [key: string]: string; // 이미 추가된 인덱스 시그니처
 };
 
-// 함수로 행 데이터 생성
 const createData = (
   id: string,
   hash: string,
   fileName: string,
   groupName: string,
-  extraInfo: string
+  extraInfo: string | null // extraInfo를 string | null로 변경
 ): RowData => {
   return { id, hash, fileName, groupName, extraInfo };
 };
 
 // 기본 행 데이터 배열 생성
-const rows: RowData[] = Array.from({ length: 12 }, (_, index) =>
+const rows: RowData[] = Array.from({ length: 10 }, (_, index) =>
   createData(
     `${index + 1}`,
     `hash${index + 1}`,
@@ -112,10 +133,13 @@ function DnaView({ isOpen }: DnaViewProps) {
   const [editingGroupName, setEditingGroupName] = useState<string | null>(null);
   const [editGroupName, setEditGroupName] = useState<string>("");
   const [editingExtraInfo, setEditingExtraInfo] = useState<string | null>(null);
-  const [editExtraInfo, setEditExtraInfo] = useState<string>("");
-  const [orderDirection, setOrderDirection] = useState<"asc" | "desc">("asc");
-  const [orderBy, setOrderBy] = useState<string>("");
+  const [orderBy, setOrderBy] = useState<string>("id");
+  const [orderDirection, setOrderDirection] = useState<"asc" | "desc">("desc");
   const editInputRef = useRef<HTMLInputElement | null>(null);
+
+  const isDuplicateId = (idToCheck: string) => {
+    return rowData.some((row) => row.id === idToCheck && row.id !== editingId);
+  };
 
   useEffect(() => {
     // 편집 모드인 경우 첫 번째 입력 필드에 포커스를 맞춥니다.
@@ -125,13 +149,13 @@ function DnaView({ isOpen }: DnaViewProps) {
     }
   }, [editingId]);
 
+  // useEffect를 사용하여 초기 로드 시 테이블을 ID로 오름차순 정렬합니다.
   useEffect(() => {
-    const loadedData = localStorage.getItem("rowData");
-    if (loadedData) {
-      setRowData(JSON.parse(loadedData));
-    }
-  }, []); // 의존성 배열을 빈 배열로 설정하여 컴포넌트 마운트 시에만 실행되도록 합니다.
+    handleRequestSort("id");
+  }, []);
 
+  // 테이블 헤더의 TableSortLabel에 대한 변경이 필요하지 않습니다.
+  // handleRequestSort 함수에서 초기 정렬 기준을 ID로 설정합니다.
   const handleRequestSort = (property: string) => {
     const isAsc = orderBy === property && orderDirection === "asc";
     setOrderDirection(isAsc ? "desc" : "asc");
@@ -155,8 +179,8 @@ function DnaView({ isOpen }: DnaViewProps) {
       };
     };
 
-    const aParts = extractParts(a[orderBy] as string);
-    const bParts = extractParts(b[orderBy] as string);
+    const aParts = extractParts(a[orderBy]);
+    const bParts = extractParts(b[orderBy]);
 
     // 먼저 문자열 부분을 비교
     if (aParts.chars.toLowerCase() < bParts.chars.toLowerCase())
@@ -172,43 +196,35 @@ function DnaView({ isOpen }: DnaViewProps) {
   }
 
   const sortArray = (array: RowData[]): RowData[] => {
-    return array.sort((a, b) => naturalSort(a, b, orderBy, orderDirection));
+    return array.sort((a, b) =>
+      naturalSort(a, b, orderBy as keyof RowData, orderDirection)
+    );
   };
 
   const sortedRows = sortArray([...rowData]);
 
   const handleSaveClick = (rowId: string) => {
-    // 현재 편집 중인 행이 rowData에 존재하는지 확인
-    const existingRow = rowData.find((row) => row.id === editingId);
-    let updatedRows;
-    if (existingRow) {
-      // 기존 행 업데이트
-      updatedRows = rowData.map((row) =>
-        row.id === editingId
-          ? {
-              ...row,
-              hash: editHash,
-              fileName: editFileName,
-              groupName: editGroupName,
-              extraInfo: editExtraInfo,
-            }
-          : row
-      );
-    } else {
-      // 새 행 추가
-      const newRow = createData(
-        editId,
-        editHash,
-        editFileName,
-        editGroupName,
-        editExtraInfo
-      );
-      updatedRows = [...rowData, newRow];
+    if (isDuplicateId(editId)) {
+      alert("분석 요청 ID가 중복됩니다. 다른 값을 입력해주세요.");
+      return;
     }
 
-    setRowData(updatedRows); // rowData 상태 업데이트
-    saveDataToLocal(updatedRows); // 변경사항을 로컬 저장소에 저장
-    clearEditingState(); // 편집 상태 초기화
+    const updatedRows = rowData.map((row) =>
+      row.id === rowId
+        ? {
+            ...row,
+            id: editId,
+            hash: editHash,
+            fileName: editFileName,
+            groupName: editGroupName,
+            extraInfo: editingExtraInfo !== null ? editingExtraInfo : "",
+          }
+        : row
+    );
+
+    setRowData(updatedRows);
+    saveDataToLocal(updatedRows);
+    clearEditingState();
   };
 
   // 편집 상태를 초기화하는 함수를 추가합니다.
@@ -223,7 +239,7 @@ function DnaView({ isOpen }: DnaViewProps) {
     setEditingGroupName(null);
     setEditGroupName("");
     setEditingExtraInfo(null);
-    setEditExtraInfo("");
+    setEditingExtraInfo("");
   };
 
   // 편집 상태에서의 포커스 관리
@@ -245,38 +261,24 @@ function DnaView({ isOpen }: DnaViewProps) {
     localStorage.setItem("rowData", JSON.stringify(data));
   };
 
-  const handleDeleteClick = (id: string) => {
+  const handleDeleteClick = async (id: string) => {
     // 사용자에게 수정 중인지 확인
     const isEditing = editingId !== null;
 
     // 사용자가 수정 중이면 경고 메시지 표시
     if (
       isEditing &&
-      !window.confirm("수정을 완료하지 않았습니다. 삭제하시겠습니까?")
+      !(await customConfirm("수정을 완료하지 않았습니다. 삭제하시겠습니까?"))
     ) {
       return; // 삭제 취소
     }
 
-    // SweetAlert2를 사용하여 삭제 여부를 묻고, 확인 시 삭제 진행
-    Swal.fire({
-      title: "삭제하시겠습니까?",
-      text: "삭제 된 데이터는 복구 할 수 없습니다.",
-      icon: "warning",
-      background: "#333",
-      color: "#fff",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "YES",
-      width: "20%",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        const updatedRows = rowData.filter((row) => row.id !== id);
-        setRowData(updatedRows);
-        saveDataToLocal(updatedRows); // 로컬 저장소에 저장
-        // Swal.fire("Deleted!", "Your file has been deleted.", "success");
-      }
-    });
+    // SweetAlert2를 사용하여 삭제 여부 확인
+    if (await customConfirm("삭제하시겠습니까?")) {
+      const updatedRows = rowData.filter((row) => row.id !== id);
+      setRowData(updatedRows);
+      saveDataToLocal(updatedRows); // 로컬 저장소에 저장
+    }
   };
 
   // 수정 클릭 이벤트 핸들러
@@ -304,7 +306,7 @@ function DnaView({ isOpen }: DnaViewProps) {
       setEditingGroupName(id);
       setEditGroupName(row.groupName);
       setEditingExtraInfo(id);
-      setEditExtraInfo(row.extraInfo);
+      setEditingExtraInfo(row.extraInfo);
     }
   };
 
@@ -345,7 +347,7 @@ function DnaView({ isOpen }: DnaViewProps) {
     setEditingGroupName(newId);
     setEditGroupName("");
     setEditingExtraInfo(newId);
-    setEditExtraInfo("");
+    setEditingExtraInfo("");
 
     // setTimeout을 사용하여 포커싱을 지연시킵니다.
     setTimeout(() => {
@@ -547,7 +549,17 @@ function DnaView({ isOpen }: DnaViewProps) {
                           className="tableHeader"
                           style={{ width: "150px" }}
                         >
-                          {row.id}
+                          {editingId === row.id ? (
+                            <TextField
+                              id={`id-${row.id}`}
+                              value={editId}
+                              onChange={(e) => setEditId(e.target.value)}
+                              fullWidth
+                              size="small"
+                            />
+                          ) : (
+                            row.id
+                          )}
                         </TableCell>
                         <TableCell
                           className="tableHeader"
@@ -604,16 +616,33 @@ function DnaView({ isOpen }: DnaViewProps) {
                         >
                           {editingExtraInfo === row.id ? (
                             <TextField
-                              id={`extrainfo-${row.id}`}
-                              value={editExtraInfo}
-                              onChange={(e) => setEditExtraInfo(e.target.value)}
+                              id={`extraInfo-${row.id}`}
+                              value={editingExtraInfo}
+                              onChange={(e) =>
+                                setEditingExtraInfo(e.target.value)
+                              }
                               fullWidth
                               size="small"
                             />
                           ) : (
-                            row.extraInfo
+                            <>
+                              {editingId === row.id ? (
+                                <TextField
+                                  id={`extraInfo-${row.id}`}
+                                  value={editingExtraInfo}
+                                  onChange={(e) =>
+                                    setEditingExtraInfo(e.target.value)
+                                  }
+                                  fullWidth
+                                  size="small"
+                                />
+                              ) : (
+                                row.extraInfo
+                              )}
+                            </>
                           )}
                         </TableCell>
+
                         <TableCell align="right" style={{ flex: "0 0 25%" }}>
                           {editingId === row.id ? (
                             <>

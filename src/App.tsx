@@ -4,6 +4,7 @@ import { GlobalStyle } from "./components/SideBar/styles/global";
 import SideBar from "./components/SideBar";
 import DnaView from "./components/DNAView";
 import styled from "styled-components";
+import SweetAlertProvider from "./components/Swal";
 
 const Layout = styled.div`
   display: flex;
@@ -23,38 +24,46 @@ export default function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
-    <Router>
-      <GlobalStyle />
-      <Layout>
-        <SideBar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
-        <Main isOpen={isSidebarOpen}>
-          <Routes>
-            <Route path="/dna-view" element={<DnaView isOpen={false} />} />
-            <Route path="/api-sequence" element={<DnaView isOpen={false} />} />
-            <Route
-              path="/sandbox-status"
-              element={<DnaView isOpen={false} />}
-            />
-            <Route
-              path="/analysis-progress"
-              element={<DnaView isOpen={false} />}
-            />
-            <Route
-              path="/sandbox-results"
-              element={<DnaView isOpen={false} />}
-            />
-            <Route path="/taget-3dview" element={<DnaView isOpen={false} />} />
-            <Route
-              path="/patterns-3dview"
-              element={<DnaView isOpen={false} />}
-            />
-            <Route
-              path="/related-3dview"
-              element={<DnaView isOpen={false} />}
-            />
-          </Routes>
-        </Main>
-      </Layout>
-    </Router>
+    <SweetAlertProvider>
+      <Router>
+        <GlobalStyle />
+        <Layout>
+          <SideBar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
+          <Main isOpen={isSidebarOpen}>
+            <Routes>
+              <Route path="/dna-view" element={<DnaView isOpen={false} />} />
+              <Route
+                path="/api-sequence"
+                element={<DnaView isOpen={false} />}
+              />
+              <Route
+                path="/sandbox-status"
+                element={<DnaView isOpen={false} />}
+              />
+              <Route
+                path="/analysis-progress"
+                element={<DnaView isOpen={false} />}
+              />
+              <Route
+                path="/sandbox-results"
+                element={<DnaView isOpen={false} />}
+              />
+              <Route
+                path="/taget-3dview"
+                element={<DnaView isOpen={false} />}
+              />
+              <Route
+                path="/patterns-3dview"
+                element={<DnaView isOpen={false} />}
+              />
+              <Route
+                path="/related-3dview"
+                element={<DnaView isOpen={false} />}
+              />
+            </Routes>
+          </Main>
+        </Layout>
+      </Router>
+    </SweetAlertProvider>
   );
 }
