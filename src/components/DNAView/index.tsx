@@ -69,6 +69,7 @@ type RowData = {
   [key: string]: string; // 이미 추가된 인덱스 시그니처
 };
 
+// 함수로 행 데이터 생성
 const createData = (
   id: string,
   hash: string,
@@ -79,6 +80,7 @@ const createData = (
   return { id, hash, fileName, groupName, extraInfo };
 };
 
+// 기본 행 데이터 배열 생성
 const rows: RowData[] = Array.from({ length: 12 }, (_, index) =>
   createData(
     `${index + 1}`,
@@ -121,6 +123,13 @@ function DnaView({ isOpen }: DnaViewProps) {
       editInputRef.current.focus();
     }
   }, [editingId]);
+
+  useEffect(() => {
+    const loadedData = localStorage.getItem("rowData");
+    if (loadedData) {
+      setRowData(JSON.parse(loadedData));
+    }
+  }, []); // 의존성 배열을 빈 배열로 설정하여 컴포넌트 마운트 시에만 실행되도록 합니다.
 
   const handleRequestSort = (property: string) => {
     const isAsc = orderBy === property && orderDirection === "asc";
@@ -168,23 +177,37 @@ function DnaView({ isOpen }: DnaViewProps) {
   const sortedRows = sortArray([...rowData]);
 
   const handleSaveClick = (rowId: string) => {
-    // 수정된 값을 상태로 업데이트
-    const updatedRows = rowData.map((row) =>
-      row.id === rowId
-        ? {
-            ...row,
-            id: editId,
-            hash: editHash,
-            fileName: editFileName,
-            groupName: editGroupName,
-            extraInfo: editExtraInfo,
-          }
-        : row
-    );
-    setRowData(updatedRows);
+    // 현재 편집 중인 행이 rowData에 존재하는지 확인
+    const existingRow = rowData.find((row) => row.id === editingId);
+    let updatedRows;
+    if (existingRow) {
+      // 기존 행 업데이트
+      updatedRows = rowData.map((row) =>
+        row.id === editingId
+          ? {
+              ...row,
+              hash: editHash,
+              fileName: editFileName,
+              groupName: editGroupName,
+              extraInfo: editExtraInfo,
+            }
+          : row
+      );
+    } else {
+      // 새 행 추가
+      const newRow = createData(
+        editId,
+        editHash,
+        editFileName,
+        editGroupName,
+        editExtraInfo
+      );
+      updatedRows = [...rowData, newRow];
+    }
 
-    // Clear editing state
-    clearEditingState();
+    setRowData(updatedRows); // rowData 상태 업데이트
+    saveDataToLocal(updatedRows); // 변경사항을 로컬 저장소에 저장
+    clearEditingState(); // 편집 상태 초기화
   };
 
   // 편집 상태를 초기화하는 함수를 추가합니다.
@@ -220,42 +243,54 @@ function DnaView({ isOpen }: DnaViewProps) {
   };
 
   const handleAddRow = () => {
-    const newRowId = editingId ? `${parseInt(editingId, 10) + 1}` : ""; // editingId가 null이 아닐 때만 처리
-
-    // 입력값을 받는 순서를 변경하고, 편집 중인 행을 새로운 행으로 설정합니다.
-    setEditingId(newRowId);
-
-    const newRow = createData(
-      newRowId, // 분석 요청 ID를 자동으로 설정합니다.
-      "new-hash",
-      "new-file.exe",
-      "New Group",
-      "N/A"
+    const maxId = rowData.reduce(
+      (max, item) => Math.max(max, parseInt(item.id, 10)),
+      0
     );
-
-    // rowData 상태 업데이트
+    const newId = (maxId + 1).toString();
+    const newRow = createData(newId, "", "", "", "");
     const updatedRows = [...rowData, newRow];
     setRowData(updatedRows);
 
-    // 새로운 행이 위치할 페이지 계산
-    const newPageIndex = Math.floor(updatedRows.length / rowsPerPage);
-    setPage(newPageIndex);
+    // 페이지를 변경하고, 추가된 행이 있는 페이지로 이동
+    const newPage = Math.ceil(updatedRows.length / rowsPerPage) - 1;
+    setPage(newPage);
 
-    // 수정 상태로 전환하고 입력 필드에 포커스를 맞춥니다.
-    setEditingId(newRowId);
+    // 새 행을 편집 모드로 설정
+    setEditingRow(newId);
+    setEditingId(newId);
+    setEditId(newId);
+    setEditingHash(newId);
+    setEditHash("");
+    setEditingFileName(newId);
+    setEditFileName("");
+    setEditingGroupName(newId);
+    setEditGroupName("");
+    setEditingExtraInfo(newId);
+    setEditExtraInfo("");
+
+    // setTimeout을 사용하여 포커싱을 지연시킵니다.
+    setTimeout(() => {
+      const editInput = document.getElementById(`hash-${newId}`);
+      if (editInput) {
+        editInput.focus();
+      }
+    }, 100);
   };
 
+  // 편집 상태에서의 포커스 관리
   useEffect(() => {
-    // 편집 모드인 경우 입력 필드에 포커스를 맞춤. 페이지 로드 완료 후 실행되도록 설정
     if (editingId && editInputRef.current) {
       setTimeout(() => {
-        // setTimeout 내부에서 다시 한번 확인
         if (editInputRef.current) {
           editInputRef.current.focus();
         }
       }, 100);
     }
-  }, [editingId, page]); // 페이지 변경 시에도 실행되도록 page 의존성 추가
+  }, [editingId]);
+
+  // 이후 코드에서 편집 가능한 필드를 렌더링할 때, `editingId` 상태를 확인하여
+  // 새로 추가된 행에 대해서도 텍스트 필드를 렌더링하게 됩니다.
 
   const saveDataToLocal = (data: RowData[]) => {
     // 로컬 저장소에 데이터 저장
@@ -307,9 +342,11 @@ function DnaView({ isOpen }: DnaViewProps) {
   return (
     <ThemeProvider theme={advancedTheme}>
       <Container maxWidth="lg">
-        <Box my={3} style={{ maxHeight: "51vh", overflow: "auto" }}>
-          악성코드 DNA 분석 결과 시각화
-          <Box my={0}>
+        <Box my={2} style={{ maxHeight: "51vh", overflow: "auto" }}>
+          <Typography variant="h6" gutterBottom>
+            악성코드 DNA 분석 결과 시각화
+          </Typography>
+          <Box my={1}>
             <Button
               variant="contained"
               color="primary"
@@ -431,18 +468,7 @@ function DnaView({ isOpen }: DnaViewProps) {
                           className="tableHeader"
                           style={{ width: "150px" }}
                         >
-                          {editingId === row.id ? (
-                            <TextField
-                              id={`id-${row.id}`}
-                              value={editId}
-                              onChange={(e) => setEditId(e.target.value)}
-                              fullWidth
-                              size="small"
-                              autoFocus // 분석 요청 ID 입력칸에 포커스를 맞춥니다.
-                            />
-                          ) : (
-                            row.id
-                          )}
+                          {row.id}
                         </TableCell>
                         <TableCell
                           className="tableHeader"
@@ -549,8 +575,33 @@ function DnaView({ isOpen }: DnaViewProps) {
           />
         </Box>
         <Box my={4}>
-          <Typography variant="h4" gutterBottom>
+          <Typography variant="h6" gutterBottom>
             API 분석 결과
+          </Typography>
+          <TableContainer component={Paper}>
+            <Table size="small">
+              <TableHead>
+                <TableRow>
+                  <TableCell className="tableHeader" style={{ width: "150px" }}>
+                    분석요청ID
+                  </TableCell>
+                  <TableCell className="tableHeader" style={{ width: "150px" }}>
+                    해시
+                  </TableCell>
+                  <TableCell className="tableHeader" style={{ width: "150px" }}>
+                    서열 정렬 결과
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {/* 여기에 추가 테이블의 데이터 매핑 및 렌더링 */}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Box>
+        <Box my={4}>
+          <Typography variant="h6" gutterBottom>
+            1:1 유사도 분석 결과
           </Typography>
           <TableContainer component={Paper}>
             <Table size="small">
