@@ -5,7 +5,7 @@ import { Container, Content, ClosedSideBar, OpenSideBar } from "./styles";
 import { IoNotificationsSharp } from "react-icons/io5"; // Ionicons
 import { MdSettings } from "react-icons/md"; // Material Design Icons
 import { BsArrowRight, BsArrowLeft } from "react-icons/bs"; // Bootstrap Icons
-import { DiReact } from "react-icons/di"; // Devicons
+// import { DiReact } from "react-icons/di"; // Devicons
 import { RiLogoutCircleRLine } from "react-icons/ri"; // Remix Icon
 
 import logoImg from "../../assets/images/react.png";

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import Swal from "sweetalert2";
 import {
   Container,
   Box,
@@ -21,6 +22,7 @@ import {
 } from "@mui/material";
 import { Delete as DeleteIcon, Edit as EditIcon } from "@mui/icons-material";
 import SaveIcon from "@mui/icons-material/Save";
+import CancelIcon from "@mui/icons-material/Cancel"; // 취소 아이콘 추가
 
 const advancedTheme = createTheme({
   palette: {
@@ -111,7 +113,6 @@ function DnaView({ isOpen }: DnaViewProps) {
   const [editGroupName, setEditGroupName] = useState<string>("");
   const [editingExtraInfo, setEditingExtraInfo] = useState<string | null>(null);
   const [editExtraInfo, setEditExtraInfo] = useState<string>("");
-  const [tableRows, setTableRows] = useState<RowData[]>(rows);
   const [orderDirection, setOrderDirection] = useState<"asc" | "desc">("asc");
   const [orderBy, setOrderBy] = useState<string>("");
   const editInputRef = useRef<HTMLInputElement | null>(null);
@@ -225,7 +226,72 @@ function DnaView({ isOpen }: DnaViewProps) {
     setEditExtraInfo("");
   };
 
+  // 편집 상태에서의 포커스 관리
+  useEffect(() => {
+    if (editingId && editInputRef.current) {
+      setTimeout(() => {
+        if (editInputRef.current) {
+          editInputRef.current.focus();
+        }
+      }, 100);
+    }
+  }, [editingId]);
+
+  // 이후 코드에서 편집 가능한 필드를 렌더링할 때, `editingId` 상태를 확인하여
+  // 새로 추가된 행에 대해서도 텍스트 필드를 렌더링하게 됩니다.
+
+  const saveDataToLocal = (data: RowData[]) => {
+    // 로컬 저장소에 데이터 저장
+    localStorage.setItem("rowData", JSON.stringify(data));
+  };
+
+  const handleDeleteClick = (id: string) => {
+    // 사용자에게 수정 중인지 확인
+    const isEditing = editingId !== null;
+
+    // 사용자가 수정 중이면 경고 메시지 표시
+    if (
+      isEditing &&
+      !window.confirm("수정을 완료하지 않았습니다. 삭제하시겠습니까?")
+    ) {
+      return; // 삭제 취소
+    }
+
+    // SweetAlert2를 사용하여 삭제 여부를 묻고, 확인 시 삭제 진행
+    Swal.fire({
+      title: "삭제하시겠습니까?",
+      text: "삭제 된 데이터는 복구 할 수 없습니다.",
+      icon: "warning",
+      background: "#333",
+      color: "#fff",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "YES",
+      width: "20%",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const updatedRows = rowData.filter((row) => row.id !== id);
+        setRowData(updatedRows);
+        saveDataToLocal(updatedRows); // 로컬 저장소에 저장
+        // Swal.fire("Deleted!", "Your file has been deleted.", "success");
+      }
+    });
+  };
+
+  // 수정 클릭 이벤트 핸들러
   const handleEditClick = (id: string) => {
+    // 사용자에게 수정 중인지 확인
+    const isEditing = editingId !== null;
+
+    // 사용자가 수정 중이면 경고 메시지 표시
+    if (
+      isEditing &&
+      !window.confirm("수정을 완료하지 않았습니다. 수정하시겠습니까?")
+    ) {
+      return; // 수정 취소
+    }
+
     // Editing 상태로 변경되었을 때 해당 행의 값을 초기값으로 설정
     const row = rowData.find((row) => row.id === id);
     if (row) {
@@ -242,7 +308,19 @@ function DnaView({ isOpen }: DnaViewProps) {
     }
   };
 
+  // 추가 행 추가 이벤트 핸들러
   const handleAddRow = () => {
+    // 사용자에게 수정 중인지 확인
+    const isEditing = editingId !== null;
+
+    // 사용자가 수정 중이면 경고 메시지 표시
+    if (
+      isEditing &&
+      !window.confirm("수정을 완료하지 않았습니다. 새 행을 추가하시겠습니까?")
+    ) {
+      return; // 추가 취소
+    }
+
     const maxId = rowData.reduce(
       (max, item) => Math.max(max, parseInt(item.id, 10)),
       0
@@ -278,36 +356,22 @@ function DnaView({ isOpen }: DnaViewProps) {
     }, 100);
   };
 
-  // 편집 상태에서의 포커스 관리
-  useEffect(() => {
-    if (editingId && editInputRef.current) {
-      setTimeout(() => {
-        if (editInputRef.current) {
-          editInputRef.current.focus();
-        }
-      }, 100);
-    }
-  }, [editingId]);
-
-  // 이후 코드에서 편집 가능한 필드를 렌더링할 때, `editingId` 상태를 확인하여
-  // 새로 추가된 행에 대해서도 텍스트 필드를 렌더링하게 됩니다.
-
-  const saveDataToLocal = (data: RowData[]) => {
-    // 로컬 저장소에 데이터 저장
-    localStorage.setItem("rowData", JSON.stringify(data));
-  };
-
-  const handleDeleteClick = (id: string) => {
-    const updatedRows = rowData.filter((row) => row.id !== id);
-    setRowData(updatedRows);
-    saveDataToLocal(updatedRows); // 로컬 저장소에 저장
-  };
-
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
     newPage: number
   ) => {
-    setPage(newPage);
+    // 사용자에게 수정 중인지 확인
+    const isEditing = editingId !== null;
+
+    // 사용자가 수정 중이면 경고 메시지 표시
+    if (
+      isEditing &&
+      !window.confirm("수정을 완료하지 않았습니다. 페이지를 변경하시겠습니까?")
+    ) {
+      return; // 페이지 변경 취소
+    }
+
+    setPage(newPage); // 페이지 번호 업데이트
   };
 
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -342,20 +406,35 @@ function DnaView({ isOpen }: DnaViewProps) {
   return (
     <ThemeProvider theme={advancedTheme}>
       <Container maxWidth="lg">
-        <Box my={2} style={{ maxHeight: "51vh", overflow: "auto" }}>
-          <Typography variant="h6" gutterBottom>
-            악성코드 DNA 분석 결과 시각화
-          </Typography>
-          <Box my={1}>
+        <Box
+          my={1}
+          style={{
+            position: "relative",
+            maxHeight: "50vh",
+            overflow: "auto",
+            padding: "20px",
+            borderRadius: "10px",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Typography variant="h6" gutterBottom>
+              악성코드 DNA 분석 결과 시각화
+            </Typography>
             <Button
               variant="contained"
               color="primary"
+              style={{ marginBottom: "5px", height: "25px" }}
               onClick={handleAddRow}
-              style={{ float: "right", marginBottom: "10px" }}
             >
-              분석 요청 추가
+              DNA 분석 요청 추가
             </Button>
-          </Box>
+          </div>
           <TableContainer component={Paper} style={{ minHeight: "33.3vh" }}>
             <Table size="small">
               <TableHead>
@@ -432,10 +511,10 @@ function DnaView({ isOpen }: DnaViewProps) {
                   </TableCell>
                   <TableCell
                     className="tableHeader"
-                    style={{ flex: "0 0 25%" }} // Actions의 너비를 늘림
+                    style={{ width: "120px" }} // Actions의 너비를 늘림
                     align="right"
                   >
-                    Actions
+                    {/* Actions */}
                   </TableCell>
                 </TableRow>
               </TableHead>
@@ -535,28 +614,37 @@ function DnaView({ isOpen }: DnaViewProps) {
                             row.extraInfo
                           )}
                         </TableCell>
-                        <TableCell
-                          className="tableHeader"
-                          style={{ width: "150px" }}
-                          align="right"
-                        >
+                        <TableCell align="right" style={{ flex: "0 0 25%" }}>
                           {editingId === row.id ? (
-                            <IconButton onClick={() => handleSaveClick(row.id)}>
-                              <SaveIcon />
-                            </IconButton>
-                          ) : (
                             <>
                               <IconButton
+                                onClick={() => handleSaveClick(row.id)}
+                                aria-label="save"
+                              >
+                                <SaveIcon />
+                              </IconButton>
+                              <IconButton
+                                onClick={() => clearEditingState()} // 편집 상태를 초기화하는 함수 호출
+                                aria-label="cancel"
+                              >
+                                <CancelIcon />
+                              </IconButton>
+                            </>
+                          ) : (
+                            <React.Fragment>
+                              <IconButton
+                                aria-label="edit"
                                 onClick={() => handleEditClick(row.id)}
                               >
                                 <EditIcon />
                               </IconButton>
                               <IconButton
+                                aria-label="delete"
                                 onClick={() => handleDeleteClick(row.id)}
                               >
                                 <DeleteIcon />
                               </IconButton>
-                            </>
+                            </React.Fragment>
                           )}
                         </TableCell>
                       </TableRow>
@@ -566,12 +654,16 @@ function DnaView({ isOpen }: DnaViewProps) {
             </Table>
           </TableContainer>
           <TablePagination
+            rowsPerPageOptions={[]}
             component="div"
-            rowsPerPageOptions={[5]} // Rows per page 설정 옵션을 5로 설정
-            count={rowData.length} // 전체 행 수
-            rowsPerPage={5} // 현재 페이지당 행 수를 5로 고정
+            count={sortedRows.length}
+            rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={handleChangePage}
+            onRowsPerPageChange={(event) => {
+              setRowsPerPage(parseInt(event.target.value, 10));
+              setPage(0);
+            }}
           />
         </Box>
         <Box my={4}>

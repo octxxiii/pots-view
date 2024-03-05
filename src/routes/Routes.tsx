@@ -1,3 +1,4 @@
+export {};
 // import React, { Suspense, useCallback, useState } from "react";
 // import { BrowserRouter } from "react-router-dom";
 // import { JiLoading } from "@/components";
