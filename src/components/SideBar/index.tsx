@@ -55,7 +55,7 @@ function SideBar({ isOpen, setIsOpen }: SideBarProps) {
                     }}
                   />
                 </a>
-                <a href="/" title="악성코드 API 서열 분석 결과 시각화">
+                <a href="/api-sequence" title="악성코드 API 서열 분석 결과 시각화">
                   <img
                     src={malware}
                     alt="Eu"
