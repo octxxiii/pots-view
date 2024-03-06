@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { GlobalStyle } from "./components/SideBar/styles/global";
 import SideBar from "./components/SideBar";
 import DnaView from "./components/DNAView";
+import Home from "./components/Home"; // 새로운 컴포넌트 추가
 import styled from "styled-components";
 import SweetAlertProvider from "./components/Swal";
 
@@ -31,6 +32,7 @@ export default function App() {
           <SideBar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
           <Main isOpen={isSidebarOpen}>
             <Routes>
+              <Route path="/" element={<Home />} /> {/* 추가된 라우트 */}
               <Route path="/dna-view" element={<DnaView isOpen={false} />} />
               <Route
                 path="/api-sequence"

@@ -24,8 +24,8 @@ const SweetAlertProvider: React.FC<SweetAlertProviderProps> = ({
       });
     };
 
-    window.confirm = async (message: string) => {
-      const { isConfirmed } = await Swal.fire({
+    window.confirm = async (message?: string | undefined): Promise<boolean> => {
+      const result = await Swal.fire({
         title: message,
         icon: "question",
         showCancelButton: true,
@@ -34,7 +34,7 @@ const SweetAlertProvider: React.FC<SweetAlertProviderProps> = ({
         background: "#333",
         color: "#fff",
       });
-      return isConfirmed;
+      return result.isConfirmed;
     };
 
     window.prompt = (message: string, defaultValue?: string) => {

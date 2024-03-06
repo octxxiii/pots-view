@@ -98,9 +98,9 @@ const createData = (
   hash: string,
   fileName: string,
   groupName: string,
-  extraInfo: string | null // extraInfo를 string | null로 변경
+  extraInfo: string | null
 ): RowData => {
-  return { id, hash, fileName, groupName, extraInfo };
+  return { id, hash, fileName, groupName, extraInfo: extraInfo || "" }; // null일 경우 빈 문자열로 대체하거나 다른 기본값으로 설정
 };
 
 // 기본 행 데이터 배열 생성
@@ -136,6 +136,7 @@ function DnaView({ isOpen }: DnaViewProps) {
   const [orderBy, setOrderBy] = useState<string>("id");
   const [orderDirection, setOrderDirection] = useState<"asc" | "desc">("desc");
   const editInputRef = useRef<HTMLInputElement | null>(null);
+  const [previousPage, setPreviousPage] = useState<number>(0); // 이전 페이지 번호 상태 추가
 
   const isDuplicateId = (idToCheck: string) => {
     return rowData.some((row) => row.id === idToCheck && row.id !== editingId);
@@ -278,6 +279,11 @@ function DnaView({ isOpen }: DnaViewProps) {
       const updatedRows = rowData.filter((row) => row.id !== id);
       setRowData(updatedRows);
       saveDataToLocal(updatedRows); // 로컬 저장소에 저장
+
+      if (updatedRows.length === 0) {
+        // 빈 페이지가 되면 첫 페이지로 이동
+        setPage(0);
+      }
     }
   };
 
@@ -310,7 +316,6 @@ function DnaView({ isOpen }: DnaViewProps) {
     }
   };
 
-  // 추가 행 추가 이벤트 핸들러
   const handleAddRow = () => {
     // 사용자에게 수정 중인지 확인
     const isEditing = editingId !== null;
@@ -356,6 +361,16 @@ function DnaView({ isOpen }: DnaViewProps) {
         editInput.focus();
       }
     }, 100);
+
+    saveDataToLocal(updatedRows); // 로컬 저장소에 저장
+  };
+
+  const handleCancelAddRow = () => {
+    const updatedRows = rowData.filter((row) => row.id !== editingRow);
+    setRowData(updatedRows);
+    setEditingRow(null); // 편집 상태를 초기화합니다.
+    clearEditingState();
+    saveDataToLocal(updatedRows); // 로컬 저장소에 저장
   };
 
   const handleChangePage = (
@@ -370,11 +385,19 @@ function DnaView({ isOpen }: DnaViewProps) {
       isEditing &&
       !window.confirm("수정을 완료하지 않았습니다. 페이지를 변경하시겠습니까?")
     ) {
-      return; // 페이지 변경 취소
+      event?.preventDefault(); // 페이지 변경 취소
+      return;
     }
 
     setPage(newPage); // 페이지 번호 업데이트
   };
+
+  useEffect(() => {
+    // rowData가 변경되면서 페이지에 데이터가 없으면 이전 페이지로 돌아갑니다.
+    if (rowData.length === 0 && page !== 0) {
+      setPage(page - 1); // 이전 페이지로 이동
+    }
+  }, [rowData]);
 
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
@@ -653,7 +676,7 @@ function DnaView({ isOpen }: DnaViewProps) {
                                 <SaveIcon />
                               </IconButton>
                               <IconButton
-                                onClick={() => clearEditingState()} // 편집 상태를 초기화하는 함수 호출
+                                onClick={handleCancelAddRow}
                                 aria-label="cancel"
                               >
                                 <CancelIcon />
